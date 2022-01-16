@@ -1,0 +1,135 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://assets/sprites/player/player_ship.png" type="Texture" id=1]
+[ext_resource path="res://native/scripts/enemies/orb/Orb.gdns" type="Script" id=2]
+[ext_resource path="res://assets/backgrounds/template_background.png" type="Texture" id=3]
+[ext_resource path="res://native/scripts/encounters/Encounter.gdns" type="Script" id=4]
+[ext_resource path="res://scenes/enemies/orb/orb.tscn" type="PackedScene" id=5]
+[ext_resource path="res://native/scripts/encounters/EncounterManager.gdns" type="Script" id=6]
+[ext_resource path="res://native/scripts/enemies/orb/SmallOrb.gdns" type="Script" id=7]
+[ext_resource path="res://native/scripts/player/Player.gdns" type="Script" id=8]
+[ext_resource path="res://native/scripts/BulletManager.gdns" type="Script" id=9]
+[ext_resource path="res://scenes/bullets/player/primary_spread/bullet02.tscn" type="PackedScene" id=10]
+[ext_resource path="res://scenes/bullets/enemies/orb_bullet.tscn" type="PackedScene" id=11]
+[ext_resource path="res://scenes/enemies/orb/orb_small.tscn" type="PackedScene" id=12]
+[ext_resource path="res://scenes/bullets/player/primary_spread/bullet01.tscn" type="PackedScene" id=13]
+[ext_resource path="res://scenes/bullets/player/primary_spread/bullet03.tscn" type="PackedScene" id=14]
+
+[node name="Root" type="Node2D"]
+
+[node name="BackgroundImage" type="Sprite" parent="."]
+position = Vector2( 240, 135 )
+texture = ExtResource( 3 )
+
+[node name="Encounters" type="Node2D" parent="."]
+script = ExtResource( 6 )
+
+[node name="Encounter1" type="Node2D" parent="Encounters"]
+script = ExtResource( 4 )
+
+[node name="Orbs" type="Node2D" parent="Encounters/Encounter1"]
+
+[node name="Orb" parent="Encounters/Encounter1/Orbs" instance=ExtResource( 5 )]
+position = Vector2( -100, 0 )
+script = ExtResource( 2 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter1/Orbs/Orb"]
+position = Vector2( 179, 40 )
+
+[node name="Orb2" parent="Encounters/Encounter1/Orbs" instance=ExtResource( 5 )]
+position = Vector2( 580, 0 )
+script = ExtResource( 2 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter1/Orbs/Orb2"]
+position = Vector2( -179, 40 )
+
+[node name="SmallOrbs" type="Node2D" parent="Encounters/Encounter1"]
+
+[node name="SmallOrb" parent="Encounters/Encounter1/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 220, -25 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter1/SmallOrbs/SmallOrb"]
+position = Vector2( -1, 47 )
+
+[node name="SmallOrb2" parent="Encounters/Encounter1/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 261, -25 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter1/SmallOrbs/SmallOrb2"]
+position = Vector2( 0, 47 )
+
+[node name="Encounter2" type="Node2D" parent="Encounters"]
+script = ExtResource( 4 )
+
+[node name="Orbs" type="Node2D" parent="Encounters/Encounter2"]
+
+[node name="SmallOrbs" type="Node2D" parent="Encounters/Encounter2"]
+
+[node name="SmallOrb" parent="Encounters/Encounter2/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 100, -12 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter2/SmallOrbs/SmallOrb"]
+position = Vector2( 52, 83 )
+
+[node name="SmallOrb2" parent="Encounters/Encounter2/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 380, -12 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter2/SmallOrbs/SmallOrb2"]
+position = Vector2( -52, 83 )
+
+[node name="SmallOrb3" parent="Encounters/Encounter2/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 100, -40 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter2/SmallOrbs/SmallOrb3"]
+position = Vector2( 52, 83 )
+
+[node name="SmallOrb4" parent="Encounters/Encounter2/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 380, -40 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter2/SmallOrbs/SmallOrb4"]
+position = Vector2( -52, 83 )
+
+[node name="SmallOrb5" parent="Encounters/Encounter2/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 100, -72 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter2/SmallOrbs/SmallOrb5"]
+position = Vector2( 52, 83 )
+
+[node name="SmallOrb6" parent="Encounters/Encounter2/SmallOrbs" instance=ExtResource( 12 )]
+position = Vector2( 380, -72 )
+script = ExtResource( 7 )
+
+[node name="Goal" type="Position2D" parent="Encounters/Encounter2/SmallOrbs/SmallOrb6"]
+position = Vector2( -52, 83 )
+
+[node name="Player" type="Node2D" parent="."]
+position = Vector2( 236, 190 )
+script = ExtResource( 8 )
+__meta__ = {
+"_edit_group_": true
+}
+
+[node name="Sprite" type="Sprite" parent="Player"]
+position = Vector2( 0, 3 )
+texture = ExtResource( 1 )
+
+[node name="Bullets" type="Node2D" parent="."]
+script = ExtResource( 9 )
+bullet_scenes/player_primary_01 = ExtResource( 13 )
+bullet_amounts/player_primary_01 = 2048
+bullet_radius/player_primary_01 = 5
+bullet_scenes/player_primary_02 = ExtResource( 10 )
+bullet_amounts/player_primary_02 = 2048
+bullet_radius/player_primary_02 = 5
+bullet_scenes/player_primary_03 = ExtResource( 14 )
+bullet_amounts/player_primary_03 = 2048
+bullet_radius/player_primary_03 = 5
+bullet_scenes/orb_bullet = ExtResource( 11 )
+bullet_amounts/orb_bullet = 2048
+bullet_radius/orb_bullet = 5

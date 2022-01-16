@@ -1,0 +1,8 @@
+[gd_resource type="GDNativeLibrary" load_steps=2 format=2]
+
+[sub_resource type="NativeScript" id=1]
+
+[resource]
+entry/X11.64 = "res://libshmup_rust/libshmup_rust.so"
+dependency/X11.64 = [  ]
+script = SubResource( 1 )

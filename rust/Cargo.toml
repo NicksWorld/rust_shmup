@@ -1,0 +1,11 @@
+[package]
+name = "shmup_rust"
+version = "0.1.0"
+authors = ["NicksWorld <nickmcdaniel00@gmail.com>"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+gdnative = { git = "https://github.com/godot-rust/godot-rust.git", features = ["custom-godot"] }
