@@ -20,6 +20,9 @@ fn init(handle: InitHandle) {
     // Enemies
     enemy::register(&handle);
 
+    // Encounters
+    custom_encounter::register(&handle);
+
     // The player
     handle.add_class::<player::Player>();
 

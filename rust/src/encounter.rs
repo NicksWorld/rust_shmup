@@ -3,10 +3,12 @@ use gdnative::api::OS;
 use gdnative::export::user_data::{Map, MapMut};
 
 use crate::bullet_manager::BulletManager;
+use crate::custom_encounter::generic_encounter::GenericEncounter;
 use crate::enemy::*;
 use generic_enemy::GenericEnemy;
 use crate::player::Player;
 
+// TODO: Change implementation to be ontop of GenericEncounter
 #[derive(NativeClass, Default)]
 #[inherit(Node2D)]
 pub struct Encounter {
@@ -27,16 +29,15 @@ pub struct Encounter {
 
     // Time (secs) that the encounter will last before timing out
     // -1 = infinite
-    // TODO: Implement this properly
     #[property(default = -1)]
     encounter_length: i64,
-    // Time the encounter started TODO: Implement properly
+    // Time the encounter started
     encounter_starttime: i64,
+    // Time to wait after encounter completion (Handled by EncounterManager)
+    #[property(default = 0)]
+    encounter_end_delay: i64,
     // Wether the encounter has completed
-    pub ended: bool,
-    // TODO: encounter_end_delay: Waits for a set period of time after the encounter
-    // has ended in order for having more pronounced seperations between segments, and
-    // allow the player to prepare
+    ended: bool,
 }
 
 #[methods]
@@ -78,15 +79,6 @@ impl Encounter {
         // Populate the enemy list
         Encounter::process_children(owner, "Orbs", &mut self.orbs);
         Encounter::process_children(owner, "SmallOrbs", &mut self.small_orbs);
-    }
-
-    // Enable the encounter by showing the enemies and starting the timer
-    pub fn set_active(&mut self, owner: &Node2D) {
-        owner.set_visible(true);
-        self.encounter_starttime = OS::godot_singleton().get_ticks_msec();
-    }
-    pub fn set_inactive(&mut self, owner: &Node2D) {
-        owner.set_visible(false);
     }
 
     fn process_enemies<T>(
@@ -133,35 +125,6 @@ impl Encounter {
         remaining_enemies
     }
 
-    pub fn tick(&mut self, _owner: &Node2D, deltatime: f32) {
-        let player_pos = self
-            .player
-            .as_ref()
-            .unwrap()
-            .map(|_x, node| node.get_global_transform().origin)
-            .unwrap();
-
-        let bullet_manager = self.bullet_manager.as_ref().unwrap();
-
-        let remaining_enemies =
-            Encounter::process_enemies(&self.orbs, bullet_manager, player_pos, deltatime)
-                + Encounter::process_enemies(
-                    &self.small_orbs,
-                    bullet_manager,
-                    player_pos,
-                    deltatime,
-                );
-
-        // TODO: Additionally wait for non-player bullets to be destroyed, allowing for a clear playspace
-        if remaining_enemies == 0 {
-            self.ended = true;
-        } else if self.encounter_length != -1 && OS::godot_singleton().get_ticks_msec() - self.encounter_starttime
-            >= self.encounter_length
-        {
-            self.ended = true;
-        }
-    }
-
     fn process_hits<T>(
         items: &Vec<TInstance<'static, T, Shared>>,
         position: Vector2,
@@ -190,9 +153,55 @@ impl Encounter {
 
         false
     }
+}
 
-    pub fn hit_enemy(&mut self, _owner: &Node2D, position: Vector2, radius: u32) -> bool {
-        return Encounter::process_hits(&self.orbs, position, radius)
-            || Encounter::process_hits(&self.small_orbs, position, radius);
+impl GenericEncounter for Encounter {
+    fn activate(&mut self, owner: &Node2D) {
+        owner.set_visible(true);
+        self.encounter_starttime = OS::godot_singleton().get_ticks_msec();
+    }
+    fn deactivate(&mut self, owner: &Node2D) {
+        owner.set_visible(false);
+    }
+
+    fn has_ended(&self) -> bool {
+        self.ended
+    }
+    fn end_delay(&self) -> i64 {
+        self.encounter_end_delay
+    }
+
+    fn tick(&mut self, _owner: &Node2D, deltatime: f32) {
+        let player_pos = self
+            .player
+            .as_ref()
+            .unwrap()
+            .map(|_x, node| node.get_global_transform().origin)
+            .unwrap();
+
+        let bullet_manager = self.bullet_manager.as_ref().unwrap();
+
+        let remaining_enemies =
+            Encounter::process_enemies(&self.orbs, bullet_manager, player_pos, deltatime)
+                + Encounter::process_enemies(
+                    &self.small_orbs,
+                    bullet_manager,
+                    player_pos,
+                    deltatime,
+                );
+
+        // TODO: Additionally wait for non-player bullets to be destroyed, allowing for a clear playspace
+        if remaining_enemies == 0 {
+            self.ended = true;
+        } else if self.encounter_length != -1 && OS::godot_singleton().get_ticks_msec() - self.encounter_starttime
+            >= self.encounter_length
+        {
+            self.ended = true;
+        }
+    }
+
+    fn hit_enemy(&mut self, _owner: &Node2D, pos: Vector2, radius: u32) -> bool {
+        return Encounter::process_hits(&self.orbs, pos, radius)
+            || Encounter::process_hits(&self.small_orbs, pos, radius);
     }
 }

@@ -26,6 +26,7 @@ script = ExtResource( 6 )
 
 [node name="Encounter1" type="Node2D" parent="Encounters"]
 script = ExtResource( 4 )
+encounter_end_delay = 10000
 
 [node name="Orbs" type="Node2D" parent="Encounters/Encounter1"]
 
