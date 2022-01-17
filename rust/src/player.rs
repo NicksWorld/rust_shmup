@@ -13,10 +13,15 @@ pub struct Player {
     shoot_timeout_ms: u32,
     #[property(default = 300.0)]
     primary_speed: f32,
+    #[property(default = 1000)]
+    hit_invulnerability_ms: i64,
 
     bullet_manager: Option<TInstance<'static, BulletManager, Shared>>,
 
     last_attack: i64,
+    last_hit: i64, // -1 for never
+
+    invulnerability_anim: u8,
 }
 
 #[methods]
@@ -27,17 +32,25 @@ impl Player {
             shoot_timeout_ms: 90,
             primary_speed: 300.0,
             bullet_manager: None,
+            hit_invulnerability_ms: 1000,
 
             last_attack: 0,
+            last_hit: -1,
+
+            invulnerability_anim: 0,
         }
     }
 
     // Called when bullet hits the player's hitbox
     // Returning true deletes the bullet, Returning false persists it
     #[export]
-    fn hit(&mut self, _owner: &Node2D) -> bool {
-        // TODO: Implement invulnerability period after being hit
-        true
+    pub fn hit(&mut self, _owner: &Node2D) -> bool {
+        if OS::godot_singleton().get_ticks_msec() - self.last_hit > self.hit_invulnerability_ms {
+            self.last_hit = OS::godot_singleton().get_ticks_msec();
+            true
+        } else {
+            false
+        }
     }
 
     // Called when the game is ready to start
@@ -124,6 +137,19 @@ impl Player {
                     );
                 })
                 .unwrap();
+        }
+
+        // Animate invulnerability with toggling visibility
+        if OS::godot_singleton().get_ticks_msec() - self.last_hit <= self.hit_invulnerability_ms {
+            self.invulnerability_anim = (self.invulnerability_anim + 1) % 4;
+            if self.invulnerability_anim <= 1 {
+                owner.set_visible(true);
+            } else {
+                owner.set_visible(false);
+            }
+        } else if self.invulnerability_anim > 1 {
+            owner.set_visible(true);
+            self.invulnerability_anim = 0;
         }
     }
 }

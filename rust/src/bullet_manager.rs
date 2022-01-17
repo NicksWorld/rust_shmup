@@ -193,9 +193,14 @@ impl BulletManager {
                     if (player_pos.x - pos.x).powf(2.0) + (player_pos.y - pos.y).powf(2.0)
                         <= (4.0 + bullet_info.radius as f32).powf(2.0)
                     {
-                        // TODO: Inform the player they have been hit
-                        node.set_visible(false);
-                        to_remove.push(i);
+                        if self.player
+                            .as_ref()
+                            .unwrap()
+                            .map_mut(|x, node| x.hit(node.as_ref()))
+                            .unwrap() {
+                            node.set_visible(false);
+                            to_remove.push(i);
+                        }
                     }
                 }
             }
